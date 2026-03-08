@@ -14,13 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -37,6 +33,10 @@ import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.legoclassifierapp.ui.theme.LEGOClassifierAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,22 +45,47 @@ class MainActivity : ComponentActivity() {
         //enableEdgeToEdge()
         setContent {
             LEGOClassifierAppTheme {
-                Scaffold(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    bottomBar = {
-                        BottomNav(
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = AddPhotoScreen
+                ) {
+                    composable<AddPhotoScreen> {
+                        Scaffold(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(84.dp),
-                            onClick = {}
-                        )
-                    }) { innerPadding ->
-                    ColPhotoButtons(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                    )
+                                .fillMaxSize(),
+                            bottomBar = {
+                                BottomNav(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(84.dp),
+                                    navController = navController
+                                )
+                            }) { innerPadding ->
+                            ColPhotoButtons(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(innerPadding)
+                            )
+                        }
+                    }
+                    composable<InventoryScreen> {
+                        Scaffold(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            bottomBar = {
+                                BottomNav(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(84.dp),
+                                    navController = navController
+                                )
+                            }) { innerPadding ->
+                            InventoryList(
+                                modifier = Modifier
+                                    .padding(innerPadding))
+                        }
+                    }
                 }
             }
         }
@@ -137,8 +162,9 @@ fun ButtonChoosePhoto(
 @Composable
 fun BottomNav(
     modifier: Modifier,
-    onClick: () -> Unit
-) {
+    navController: NavController,
+    ) {
+    var checked by remember { mutableStateOf(false) }
     Row(
         modifier = modifier
             .background(color = Color.Yellow),
@@ -146,21 +172,28 @@ fun BottomNav(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SwitchNavigation(
-            onClick = onClick
+            checked = checked,
+            onCheckedChange = { newValue -> checked = newValue
+
+                if (newValue) {
+                    navController.navigate(AddPhotoScreen)
+                } else {
+                    navController.navigate(InventoryScreen)
+                }
+            }
         )
     }
 }
 
 @Composable
 fun SwitchNavigation(
-    onClick: () -> Unit
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
 ) {
     var checked by remember { mutableStateOf(true) }
     Switch(
         checked = checked,
-        onCheckedChange = {
-            checked = it
-        },
+        onCheckedChange = onCheckedChange,
         colors = SwitchDefaults.colors(
             checkedThumbColor = Color.LightGray,
             checkedTrackColor = Color.White,
@@ -190,12 +223,9 @@ fun SwitchNavigation(
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun BottomNavPreview()
-{
-    BottomNav(
-        modifier = Modifier,
-        onClick = {}
-    )
+fun InventoryList(
+    modifier: Modifier
+) {
+    Text(text = "Placeholder")
 }
