@@ -2,11 +2,16 @@ package com.example.legoclassifierapp
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
@@ -55,6 +60,13 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 var checked by remember { mutableStateOf(false) }
                 val REQUEST_IMAGE_CAPTURE = 1
+                var selectedImageUri by remember {
+                    mutableStateOf<Uri?>(null)
+                }
+                val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.PickVisualMedia(),
+                    onResult = { uri -> selectedImageUri = uri }
+                )
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -79,13 +91,18 @@ class MainActivity : ComponentActivity() {
                             ColPhotoButtons(
                                 modifier = Modifier
                                     .padding(innerPadding),
-                                onClick = {
+                                onClickAdd = {
                                     val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                                     try {
                                         startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
                                     } catch (e: ActivityNotFoundException) {
                                         // display error state to the user
                                     }
+                                },
+                                onClickSelect = {
+                                    singlePhotoPickerLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
                                 }
                             )
                         }
@@ -104,7 +121,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ColPhotoButtons(
     modifier: Modifier,
-    onClick: () -> Unit
+    onClickAdd: () -> Unit,
+    onClickSelect: () -> Unit
 ) {
     Column(
         modifier = modifier
@@ -120,7 +138,7 @@ fun ColPhotoButtons(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(32.dp),
-                onClick = onClick,
+                onClick = onClickAdd,
             )
         }
         Row(
@@ -133,7 +151,7 @@ fun ColPhotoButtons(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(32.dp),
-                onClick = {}
+                onClick = onClickSelect
             )
         }
     }
