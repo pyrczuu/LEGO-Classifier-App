@@ -42,48 +42,38 @@ import com.example.legoclassifierapp.ui.theme.LEGOClassifierAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //enableEdgeToEdge()
         setContent {
             LEGOClassifierAppTheme {
                 val navController = rememberNavController()
-                NavHost(
-                    navController = navController,
-                    startDestination = AddPhotoScreen
-                ) {
-                    composable<AddPhotoScreen> {
-                        Scaffold(
+                var checked by remember { mutableStateOf(false) }
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    bottomBar = {
+                        BottomNav(
                             modifier = Modifier
-                                .fillMaxSize(),
-                            bottomBar = {
-                                BottomNav(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(84.dp),
-                                    navController = navController
-                                )
-                            }) { innerPadding ->
+                                .fillMaxWidth()
+                                .height(84.dp),
+                            navController = navController,
+                            checked = checked,
+                            onCheckedChange = { checked = it }
+                        )
+                    }) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = AddPhotoScreen,
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+                        composable<AddPhotoScreen> {
                             ColPhotoButtons(
                                 modifier = Modifier
-                                    .fillMaxSize()
                                     .padding(innerPadding)
                             )
                         }
-                    }
-                    composable<InventoryScreen> {
-                        Scaffold(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            bottomBar = {
-                                BottomNav(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(84.dp),
-                                    navController = navController
-                                )
-                            }) { innerPadding ->
+                        composable<InventoryScreen> {
                             InventoryList(
-                                modifier = Modifier
-                                    .padding(innerPadding))
+                                modifier = Modifier.padding(innerPadding)
+                            )
                         }
                     }
                 }
@@ -132,11 +122,11 @@ fun ColPhotoButtons(
 fun ButtonTakePhoto(
     modifier: Modifier,
     onClick: () -> Unit
-){
+) {
     Button(
         onClick = onClick,
         modifier = modifier
-    ){
+    ) {
         Text(
             text = "Take a photo"
         )
@@ -152,7 +142,7 @@ fun ButtonChoosePhoto(
         onClick = onClick,
         modifier = modifier,
 
-    ) {
+        ) {
         Text(
             text = "Choose a photo"
         )
@@ -161,24 +151,27 @@ fun ButtonChoosePhoto(
 
 @Composable
 fun BottomNav(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     navController: NavController,
-    ) {
-    var checked by remember { mutableStateOf(false) }
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
     Row(
-        modifier = modifier
-            .background(color = Color.Yellow),
+        modifier = modifier.background(Color.Yellow),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         SwitchNavigation(
             checked = checked,
-            onCheckedChange = { newValue -> checked = newValue
+            onCheckedChange = { newValue ->
+
+                onCheckedChange(newValue)
 
                 if (newValue) {
-                    navController.navigate(AddPhotoScreen)
-                } else {
                     navController.navigate(InventoryScreen)
+                } else {
+                    navController.navigate(AddPhotoScreen)
                 }
             }
         )
@@ -190,7 +183,6 @@ fun SwitchNavigation(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    var checked by remember { mutableStateOf(true) }
     Switch(
         checked = checked,
         onCheckedChange = onCheckedChange,
