@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1065902966915",
+    "project_id": "lego-classification-app",
+    "storage_bucket": "lego-classification-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065902966915:android:e6b2fb1a8495cf5dff33b6",
+        "android_client_info": {
+          "package_name": "com.example.legoclassifierapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzH2QSMgAxP36iIvn-DuFmgHe-olI_LeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
