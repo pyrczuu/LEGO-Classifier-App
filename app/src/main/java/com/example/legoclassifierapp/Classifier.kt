@@ -38,7 +38,7 @@ fun classifyImage(
     height: Int = 128,
     interpreter: Interpreter?,
     context: Context,
-    onResult: (String) -> Unit = {}
+    onResult: (label: String, displayResult: String) -> Unit = { _, _ -> }
 ) {
     if (interpreter == null) return
 
@@ -83,7 +83,16 @@ fun classifyImage(
         }
     }
     
-    val result = "${labels[maxIdx]} (${String.format("%.1f", maxProb * 100)}%)"
-    Log.d("CLASSIFIER", "Result: $result")
-    onResult(result)
+    val label = labels[maxIdx]
+    val displayResult = "$label (${String.format("%.1f", maxProb * 100)}%)"
+    Log.d("CLASSIFIER", "Result: $displayResult")
+    onResult(label, displayResult)
+}
+
+fun getLabelIndex(label: String, context: Context): Int? {
+    val labels = context.assets.open("custom_labels.txt")
+        .bufferedReader()
+        .useLines { it.toList() }
+    val index = labels.indexOfFirst { it.trim() == label.trim() }
+    return if (index == -1) null else index + 1 // +1 if your DB IDs are 1-based
 }
